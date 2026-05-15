@@ -50,3 +50,15 @@ class NTAdapter(TelemetryAdapter):
 
         else:
             table.putString(key, str(value))
+
+    TOPIC_MAP = {
+
+    "vision.back.tx":
+        ("limelight-back", "piece_tx"),
+
+    "vision.back.bbox":
+        ("limelight-back", "bbox"),
+
+    "vision.back.hasTarget":
+        ("limelight-back", "has_target"),
+}      

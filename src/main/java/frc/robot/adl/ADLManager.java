@@ -3,7 +3,9 @@ package frc.robot.adl;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.Timer;
+
 import frc.robot.Constants;
+import frc.robot.shared.RobotTopics;
 
 public class ADLManager {
 
@@ -29,53 +31,94 @@ public class ADLManager {
         this.executor        = executor;
 
         var nt = NetworkTableInstance.getDefault();
-        statePub    = nt.getStringTopic("/ADL/state").publish();
-        decisionPub = nt.getStringTopic("/ADL/decision").publish();
+
+        statePub = nt
+            .getStringTopic(RobotTopics.ADL.STATE)
+            .publish();
+
+        decisionPub = nt
+            .getStringTopic(RobotTopics.ADL.DECISION)
+            .publish();
 
         publishState("ADL inicializado");
     }
 
     public void periodic() {
+
         HumanIntent intent = intentSource.pollIntent();
-        RobotContext context = contextProvider.build();
+
+        if (intent == null) {
+            return;
+        }
+
         double now = Timer.getFPGATimestamp();
 
-        if (intent == null) return;
+        if (now - lastDecisionTime
+                < Constants.ADLManager.MIN_DECISION_INTERVAL) {
+            return;
+        }
 
-        if (now - lastDecisionTime < Constants.ADLManager.MIN_DECISION_INTERVAL) return;
+        RobotContext context = contextProvider.build();
 
-        DecisionResult result = ADLDecision.decide(intent, currentState, context);
+        DecisionResult result =
+            ADLDecision.decide(intent, currentState, context);
+
         lastDecision = result;
         lastDecisionTime = now;
+
         handleDecision(result);
     }
 
     private void handleDecision(DecisionResult result) {
+
         switch (result.type) {
+
             case EXECUTE:
             case MODIFY:
+
                 currentState = result.state;
+
                 executor.execute(currentState);
+
                 publishState(result.reason);
+
                 break;
+
             case HOLD:
-                publishDecision("HOLD: " + result.reason);
+
+                publishDecision(
+                    "HOLD: " + result.reason
+                );
+
                 break;
+
             case REJECT:
-                publishDecision("REJECT: " + result.reason);
+
+                publishDecision(
+                    "REJECT: " + result.reason
+                );
+
                 break;
         }
     }
 
     private void publishState(String reason) {
+
         statePub.set(currentState.name());
+
         decisionPub.set(reason);
     }
 
     private void publishDecision(String reason) {
+
         decisionPub.set(reason);
     }
 
-    public ADLState getCurrentState() { return currentState; }
-    public DecisionResult getLastDecision() { return lastDecision; }
+    public ADLState getCurrentState() {
+        return currentState;
+    }
+
+    public DecisionResult getLastDecision() {
+        return lastDecision;
+    }
 }

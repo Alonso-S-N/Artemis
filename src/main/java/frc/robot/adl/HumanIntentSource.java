@@ -2,6 +2,7 @@ package frc.robot.adl;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
+import frc.robot.shared.RobotTopics;
 
 public class HumanIntentSource {
 
@@ -10,7 +11,7 @@ public class HumanIntentSource {
 
     public HumanIntentSource() {
         intentSub = NetworkTableInstance.getDefault()
-            .getStringTopic("/ADL/intent")
+            .getStringTopic(RobotTopics.ADL.INTENT)
             .subscribe("");
     }
 
