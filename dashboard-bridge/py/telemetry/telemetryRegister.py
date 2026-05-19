@@ -1,4 +1,4 @@
-from telemetry.topics import *
+from telemetry.telemetry import *
 
 ALL_TOPICS = [
     BATTERY_VOLTAGE,

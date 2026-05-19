@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-from telemetry.registry import ALL_TOPICS
+from telemetry.telemetryRegister import ALL_TOPICS
 
 async def telemetry_monitor(adapter, broadcast):
 
