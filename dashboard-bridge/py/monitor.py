@@ -6,6 +6,8 @@ from telemetry.telemetryRegister import ALL_TOPICS
 
 async def monitor(adapter):
 
+    last_values = {}
+
     while True:
 
         for topic in ALL_TOPICS:
@@ -17,6 +19,11 @@ async def monitor(adapter):
 
             if value is None:
                 continue
+
+            if last_values.get(topic.id) == value:
+                continue
+
+            last_values[topic.id] = value
 
             msg = json.dumps({
                 "topic": topic.id,

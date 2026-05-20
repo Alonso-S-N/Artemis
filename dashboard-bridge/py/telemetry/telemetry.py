@@ -55,3 +55,34 @@ HAS_GAME_PIECE = Topic(
     type=bool,
     default=False
 )
+MOVING = Topic(
+    id="drive.moving",
+    table="Drive",
+    key="Moving",
+    type=bool,
+    default=False
+)
+
+ENDGAME = Topic(
+    id="game.endgame",
+    table="Game",
+    key="Endgame",
+    type=bool,
+    default=False
+)
+
+SHOOTER_RPM_CURRENT = Topic(
+    id="mechanisms.shooterRpmCurrent",
+    table="Mechanisms",
+    key="ShooterRPMCurrent",
+    type=float,
+    default=0.0
+)
+
+SHOOTER_RPM_TARGET = Topic(
+    id="mechanisms.shooterRpmTarget",
+    table="Mechanisms",
+    key="ShooterRPMTarget",
+    type=float,
+    default=0.0
+)

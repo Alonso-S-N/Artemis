@@ -6,7 +6,7 @@ import {
   onConnectionChange
 } from "../ws.js";
 
-import { Topics } from "../topics.js";
+import { TOPICS } from "../topics.js";
 
 // ═══════════════════════════════════════
 // STATE META
@@ -158,42 +158,72 @@ onNTMessage((topic, value) => {
 
   switch (topic) {
 
-    case Topics.ADL_STATE:
+    // ═════════ ADL ═════════
+
+    case TOPICS.ADL.STATE:
 
       setState(String(value));
       break;
 
-    case Topics.ADL_DECISION:
+    case TOPICS.ADL.DECISION:
 
       setDecision(String(value));
       break;
 
-    case Topics.VISION_HAS_TARGET:
+    case TOPICS.ADL.INTENT:
+
+      break;
+
+    // ═════════ VISION ═════════
+
+    case TOPICS.VISION.HAS_TARGET:
 
       setPill(el.ctxVision, Boolean(value));
       break;
 
-    case Topics.VISION_ALIGNED:
+    case TOPICS.VISION.ALIGNED:
 
       setPill(el.ctxAligned, Boolean(value));
       break;
 
-    case Topics.SHOOTER_READY:
+    // ═════════ MECHANISMS ═════════
+
+    case TOPICS.MECHANISMS.SHOOTER_READY:
 
       setPill(el.ctxShooter, Boolean(value));
       break;
 
-    case Topics.HAS_GAME_PIECE:
+    case TOPICS.MECHANISMS.HAS_GAME_PIECE:
 
       setPill(el.ctxPiece, Boolean(value));
       break;
 
-    case Topics.MOVING:
+    case TOPICS.MECHANISMS.SHOOTER_RPM_CURRENT:
+
+      rpmCurrent = Number(value);
+
+      updateRpm();
+
+      break;
+
+    case TOPICS.MECHANISMS.SHOOTER_RPM_TARGET:
+
+      rpmTarget = Number(value);
+
+      updateRpm();
+
+      break;
+
+    // ═════════ DRIVE ═════════
+
+    case TOPICS.DRIVE.MOVING:
 
       setPill(el.ctxMoving, Boolean(value));
       break;
 
-    case Topics.ENDGAME: {
+    // ═════════ GAME ═════════
+
+    case TOPICS.GAME.ENDGAME: {
 
       const active = Boolean(value);
 
@@ -216,7 +246,9 @@ onNTMessage((topic, value) => {
       break;
     }
 
-    case Topics.BATTERY_VOLTAGE: {
+    // ═════════ ROBOT ═════════
+
+    case TOPICS.ROBOT.BATTERY_VOLTAGE: {
 
       const voltage = Number(value);
 
@@ -237,24 +269,102 @@ onNTMessage((topic, value) => {
       break;
     }
 
-    case Topics.SHOOTER_RPM_CURRENT:
+    // ═════════ STRESS ═════════
 
-      rpmCurrent = Number(value);
+    case TOPICS.STRESS.BATTERY_VOLTAGE:
 
-      updateRpm();
+      document.getElementById(
+        "battery-voltage"
+      ).textContent =
+        Number(value).toFixed(2) + " V";
 
       break;
 
-    case Topics.SHOOTER_RPM_TARGET:
+    case TOPICS.STRESS.TOTAL_CURRENT:
 
-      rpmTarget = Number(value);
+      document.getElementById(
+        "total-current"
+      ).textContent =
+        Number(value).toFixed(1) + " A";
 
-      updateRpm();
+      break;
+
+    case TOPICS.STRESS.DRIVETRAIN_CURRENT:
+
+      document.getElementById(
+        "drivetrain-current"
+      ).textContent =
+        Number(value).toFixed(1) + " A";
+
+      break;
+
+    case TOPICS.STRESS.SCORE:
+
+      document.getElementById(
+        "stress-score"
+      ).textContent =
+        Number(value).toFixed(0);
+
+      break;
+
+    case TOPICS.STRESS.LEVEL: {
+
+      const box =
+        document.getElementById(
+          "stress-status"
+        );
+
+      box.textContent = value;
+
+      box.className =
+        "status-box " +
+        String(value).toLowerCase();
+
+      break;
+    }
+
+    case TOPICS.STRESS.SPEED_SCALE: {
+
+      const percent =
+        Number(value) * 100;
+
+      document.getElementById(
+        "speed-scale"
+      ).textContent =
+        percent.toFixed(0) + "%";
+
+      const warning =
+        document.getElementById(
+          "speed-warning"
+        );
+
+      if (percent < 100) {
+
+        warning.classList.remove(
+          "hidden"
+        );
+
+      } else {
+
+        warning.classList.add(
+          "hidden"
+        );
+      }
+
+      break;
+    }
+
+    case TOPICS.STRESS.CHASSIS_SPEED:
+
+      document.getElementById(
+        "chassis-speed"
+      ).textContent =
+        Number(value).toFixed(2) +
+        " m/s";
 
       break;
   }
 });
-
 // ═══════════════════════════════════════
 // RPM
 // ═══════════════════════════════════════
@@ -485,7 +595,7 @@ function sendIntent(cmd) {
 
   ntSend({
 
-    topic: Topics.ADL_INTENT,
+    topic: TOPICS.ADL.INTENT,
 
     value: cmd
   });

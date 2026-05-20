@@ -38,25 +38,25 @@ export const TOPICS = {
   STRESS: {
 
     BATTERY_VOLTAGE:
-      "/Stress/BatteryVoltage",
+      "stressBatteryVoltage",
 
     TOTAL_CURRENT:
-      "/Stress/TotalCurrent",
+      "stressTotalCurrent",
 
     DRIVETRAIN_CURRENT:
-      "/Stress/DrivetrainCurrent",
+      "stressDrivetrainCurrent",
 
     SCORE:
-      "/Stress/Score",
+      "stressScore",
 
     LEVEL:
-      "/Stress/Level",
+      "stressLevel",
 
     SPEED_SCALE:
-      "/Stress/SpeedScale",
+      "stressSpeedScale",
 
     CHASSIS_SPEED:
-      "/Stress/ChassisSpeed",
+      "stressChassisSpeed",
   },
 
   LIMELIGHT_BACK: {
