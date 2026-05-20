@@ -1,10 +1,5 @@
 "use strict";
 
-// ═══════════════════════════════════════
-// WS.JS — WebSocket único compartilhado
-// HYDRA #9163
-// ═══════════════════════════════════════
-
 const WS_URL = "ws://127.0.0.1:5901/nt/dashboard";
 
 const _handlers = [];
