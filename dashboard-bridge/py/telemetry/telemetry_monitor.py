@@ -5,7 +5,7 @@ from telemetry.telemetryRegister import ALL_TOPICS
 
 async def telemetry_monitor(adapter, broadcast):
 
-    print("📡 Telemetry monitor iniciado")
+    print(" Telemetry monitor iniciado")
 
     last_values = {}
 

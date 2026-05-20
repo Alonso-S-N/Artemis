@@ -13,6 +13,6 @@ async def run(adapter, port):
         max_size=None
     ):
 
-        print(f"🚀 WS em :{port}")
+        print(f" WS em :{port}")
 
         await asyncio.Future()

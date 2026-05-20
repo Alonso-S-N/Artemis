@@ -7,10 +7,6 @@ from networktables import NetworkTables
 clients = set()
 PULSE_TIME = 0.2
 
-# =========================
-# SUAS TABLES
-# =========================
-
 TABLES_AND_KEYS = {
     "RobotStress": [
         "batteryVoltage",
@@ -100,8 +96,6 @@ TABLES_AND_KEYS = {
 # =========================
 
 def init_nt(server_ip: str):
-    # CORRECAO: so inicializa se ainda nao estiver conectado,
-    # evitando conflito com a inicializacao do AI_Data.py
     if NetworkTables.isConnected():
         print(f"🔗 NT3 -> {server_ip} (ja conectado, reaproveitando)")
         return
@@ -149,11 +143,6 @@ async def pulse_button(table, key):
     await asyncio.sleep(PULSE_TIME)
     table.putBoolean(key, False)
 
-
-# =========================
-# NT MONITOR
-# =========================
-
 async def nt_monitor():
     print("📡 Monitor NT3 iniciado")
 
@@ -188,10 +177,6 @@ async def nt_monitor():
                         clients.discard(ws)
 
         await asyncio.sleep(0.1)
-
-# =========================
-# WEBSOCKET
-# =========================
 
 async def handle_ws(ws, path=None):
     clients.add(ws)

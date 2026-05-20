@@ -1,7 +1,7 @@
 "use strict";
 
 import { subscribe } from "../ws.js";
-import { Topics } from "../core/topics.js";
+import { TOPICS } from "../topics.js";
 
 // ═══════════════════════════════════════
 // STATE
@@ -55,7 +55,7 @@ const el = {
 
 subscribe(
 
-  Topics.STRESS_BATTERY_VOLTAGE,
+  TOPICS.STRESS_BATTERY_VOLTAGE,
 
   value => {
 
@@ -68,7 +68,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_TOTAL_CURRENT,
+  TOPICS.STRESS_TOTAL_CURRENT,
 
   value => {
 
@@ -81,7 +81,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_DRIVETRAIN_CURRENT,
+  TOPICS.STRESS_DRIVETRAIN_CURRENT,
 
   value => {
 
@@ -94,7 +94,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_SCORE,
+  TOPICS.STRESS_SCORE,
 
   value => {
 
@@ -107,7 +107,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_LEVEL,
+  TOPICS.STRESS_LEVEL,
 
   value => {
 
@@ -120,7 +120,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_SPEED_SCALE,
+  TOPICS.STRESS_SPEED_SCALE,
 
   value => {
 
@@ -133,7 +133,7 @@ subscribe(
 
 subscribe(
 
-  Topics.STRESS_CHASSIS_SPEED,
+  TOPICS.STRESS_CHASSIS_SPEED,
 
   value => {
 
