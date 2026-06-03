@@ -1,73 +1,128 @@
-export const TOPICS = {
+"use strict";
 
-  ADL: {
-    STATE: "/ADL/State",
-    DECISION: "/ADL/Decision",
-    INTENT: "/ADL/Intent",
-  },
+import { subscribe } from "./ws.js";
+import { TOPICS } from "./stress/stress.js";
 
-  VISION: {
-    HAS_TARGET: "/Vision/HasTarget",
-    ALIGNED: "/Vision/Aligned",
-    CONFIDENCE: "/Vision/Confidence",
-  },
 
-  ROBOT: {
-    BATTERY_VOLTAGE: "/Robot/BatteryVoltage",
-    SPEED_LIMITED: "/Robot/SpeedLimited",
-  },
-
-  DRIVE: {
-    MOVING: "/Drive/Moving",
-    CHASSIS_SPEED: "/Drive/ChassisSpeed",
-  },
-
-  GAME: {
-    ENDGAME: "/Game/Endgame",
-  },
-
-  MECHANISMS: {
-    HAS_GAME_PIECE: "/Mechanisms/HasGamePiece",
-    SHOOTER_READY: "/Mechanisms/ShooterReady",
-    SHOOTER_RPM_CURRENT:
-      "/Mechanisms/ShooterRPMCurrent",
-    SHOOTER_RPM_TARGET:
-      "/Mechanisms/ShooterRPMTarget",
-  },
-
-  STRESS: {
-
-    BATTERY_VOLTAGE:
-      "stressBatteryVoltage",
-
-    TOTAL_CURRENT:
-      "stressTotalCurrent",
-
-    DRIVETRAIN_CURRENT:
-      "stressDrivetrainCurrent",
-
-    SCORE:
-      "stressScore",
-
-    LEVEL:
-      "stressLevel",
-
-    SPEED_SCALE:
-      "stressSpeedScale",
-
-    CHASSIS_SPEED:
-      "stressChassisSpeed",
-  },
-
-  LIMELIGHT_BACK: {
-    TX: "/LimelightBack/PieceTX",
-    BBOX: "/LimelightBack/BBox",
-    HAS_TARGET:
-      "/LimelightBack/HasTarget",
-  },
-
-  MODES: {
-    ALIGN_LIME2:
-      "/Modes/AlignLime2",
-  }
+const stress = {
+  batteryVoltage:    0,
+  totalCurrent:      0,
+  drivetrainCurrent: 0,
+  stressScore:       0,
+  stressLevel:       "LOW",
+  speedScale:        1,
+  chassisSpeed:      0,
 };
+
+// ═══════════════════════════════════════
+// DOM
+// ═══════════════════════════════════════
+
+const el = {
+  batteryVoltage:    document.getElementById("battery-voltage"),
+  totalCurrent:      document.getElementById("total-current"),
+  drivetrainCurrent: document.getElementById("drivetrain-current"),
+  stressScore:       document.getElementById("stress-score"),
+  chassisSpeed:      document.getElementById("chassis-speed"),
+  speedScale:        document.getElementById("speed-scale"),
+  stressStatus:      document.getElementById("stress-status"),
+  speedWarning:      document.getElementById("speed-warning"),
+};
+
+// ═══════════════════════════════════════
+// SUBSCRIPTIONS
+// ═══════════════════════════════════════
+
+subscribe(TOPICS.STRESS.BATTERY_VOLTAGE, v => {
+  stress.batteryVoltage = Number(v); render();
+});
+
+subscribe(TOPICS.STRESS.TOTAL_CURRENT, v => {
+  stress.totalCurrent = Number(v); render();
+});
+
+subscribe(TOPICS.STRESS.DRIVETRAIN_CURRENT, v => {
+  stress.drivetrainCurrent = Number(v); render();
+});
+
+subscribe(TOPICS.STRESS.SCORE, v => {
+  stress.stressScore = Number(v); render();
+});
+
+subscribe(TOPICS.STRESS.LEVEL, v => {
+  stress.stressLevel = String(v); render();
+});
+
+subscribe(TOPICS.STRESS.SPEED_SCALE, v => {
+  stress.speedScale = Number(v); render();
+});
+
+subscribe(TOPICS.STRESS.CHASSIS_SPEED, v => {
+  stress.chassisSpeed = Number(v); render();
+});
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+
+function render() {
+  requestAnimationFrame(() => {
+    renderNumbers();
+    renderStressStatus();
+    renderWarnings();
+  });
+}
+
+function renderNumbers() {
+  setText(el.batteryVoltage,    stress.batteryVoltage,    " V",   2);
+  setText(el.totalCurrent,      stress.totalCurrent,      " A",   1);
+  setText(el.drivetrainCurrent, stress.drivetrainCurrent, " A",   1);
+  setText(el.stressScore,       stress.stressScore,       "",     0);
+  setText(el.chassisSpeed,      stress.chassisSpeed,      " m/s", 2);
+
+  if (el.speedScale) {
+    el.speedScale.innerText = Math.round(stress.speedScale * 100) + "%";
+  }
+}
+
+function renderStressStatus() {
+  if (!el.stressStatus) return;
+
+  el.stressStatus.textContent = stress.stressLevel;
+  el.stressStatus.className = "";
+
+  const classMap = {
+    LOW:      "status-ok",
+    MEDIUM:   "status-medium",
+    HIGH:     "status-high",
+    CRITICAL: "status-critical",
+  };
+
+  el.stressStatus.classList.add(
+    classMap[stress.stressLevel] ?? "status-ok"
+  );
+}
+
+function renderWarnings() {
+  if (!el.speedWarning) return;
+
+  const lowVoltage  = stress.batteryVoltage < 11.0;
+  const speedLimited = stress.speedScale < 1.0;
+
+  el.speedWarning.classList.toggle("hidden", !(lowVoltage && speedLimited));
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+
+function setText(elem, value, suffix = "", decimals = 0) {
+  if (!elem || typeof value !== "number" || !isFinite(value)) return;
+  elem.innerText = value.toFixed(decimals) + suffix;
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+
+render();

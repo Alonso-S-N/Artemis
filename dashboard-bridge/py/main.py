@@ -1,43 +1,37 @@
+# main.py — ponto de entrada
+# Não edite este arquivo. Configure em config.py.
+
 import asyncio
+import http.server
+import threading
+import os
 
-from telemetry.Adapters_nt_adapter import NTAdapter
-from telemetry.telemetry_loop import telemetry_loop
+import nt_bridge
+import ws_server
 
-from monitor import monitor
+DASHBOARD_PATH = r"C:\Users\Usuario\Artemis\dashboard-web"
+HTTP_PORT = 5800
 
-from ws_server.server import run as ws_run
 
-ROBOT_IP = "10.91.63.2"
-WS_PORT = 5901
+def start_http_server():
+    os.chdir(DASHBOARD_PATH)
+    handler = http.server.SimpleHTTPRequestHandler
+    httpd = http.server.HTTPServer(("0.0.0.0", HTTP_PORT), handler)
+    print(f"Dashboard em http://localhost:{HTTP_PORT}")
+    httpd.serve_forever()
 
 
 async def main():
+    # servidor HTTP em thread separada (não bloqueia o asyncio)
+    thread = threading.Thread(target=start_http_server, daemon=True)
+    thread.start()
 
-    adapter = NTAdapter(ROBOT_IP)
-
-    adapter.connect()
-    adapter.debug_table("SmartDashboard")
-
-    adapter.debug_table("Shuffleboard")
-
-    adapter.debug_table("datatable")
-
-    adapter.debug_table("stress")
-    adapter.debug_table("Telemetry")
-
-    adapter.debug_table("Drive")
-
-    adapter.debug_table("Robot")
-    await asyncio.gather(
-
-        monitor(adapter),
-
-        telemetry_loop(adapter),
-
-        ws_run(adapter, WS_PORT)
-    )
+    nt_bridge.connect()
+    await ws_server.run()
 
 
 if __name__ == "__main__":
-
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Encerrando...")

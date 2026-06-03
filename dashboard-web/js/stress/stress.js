@@ -1,317 +1,89 @@
 "use strict";
 
-import { subscribe } from "../ws.js";
-import { TOPICS } from "../topics.js";
+export const TOPICS = {
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
+  ADL: {
+    STATE:    "/ADL/state",
+    DECISION: "/ADL/decision",
+    INTENT:   "/ADL/intent",
+  },
 
-const stress = {
+  VISION: {
+    HAS_TARGET:  "/Vision/HasTarget",
+    ALIGNED:     "/Vision/Aligned",
+    CONFIDENCE:  "/Vision/Confidence",
+  },
 
-  batteryVoltage: 0,
-  totalCurrent: 0,
-  drivetrainCurrent: 0,
-  stressScore: 0,
-  stressLevel: "LOW",
-  speedScale: 1,
-  chassisSpeed: 0,
+  MECHANISMS: {
+    SHOOTER_READY:   "/Mechanisms/ShooterReady",
+    HAS_GAME_PIECE:  "/Mechanisms/HasGamePiece",
+    INTAKE_ACTIVE:   "/Mechanisms/IntakeActive",
+    CLIMB_AVAILABLE: "/Mechanisms/ClimbAvailable",
+  },
+
+  SHOOTER: {
+    RPM_CURRENT: "/Shooter/CurrentRPM",
+    RPM_TARGET:  "/Shooter/TargetRPM",
+  },
+
+  DRIVE: {
+    MOVING: "/Drive/Moving",
+  },
+
+  ROBOT: {
+    BATTERY:       "/Robot/BatteryVoltage",
+    SPEED_LIMITED: "/Robot/SpeedLimited",
+  },
+
+  GAME: {
+    ENDGAME: "/Game/Endgame",
+  },
+
+  STRESS: {
+    BATTERY_VOLTAGE:    "/RobotStress/batteryVoltage",
+    TOTAL_CURRENT:      "/RobotStress/totalCurrent",
+    DRIVETRAIN_CURRENT: "/RobotStress/drivetrainCurrent",
+    SCORE:              "/RobotStress/stressScore",
+    LEVEL:              "/RobotStress/stressLevel",
+    SPEED_SCALE:        "/RobotStress/speedScale",
+    CHASSIS_SPEED:      "/RobotStress/chassisSpeed",
+  },
+
+  LIMELIGHT_BACK: {
+    TX:         "/limelight-back/piece_tx",
+    TA:         "/limelight-back/ta",
+    DISTANCE:   "/limelight-back/piece_distance",
+    HAS_TARGET: "/limelight-back/has_target",
+    BBOX:       "/limelight-back/bbox",
+    HW:         "/limelight-back/hw",
+  },
+
+  LIMELIGHT_FRONT: {
+    TX: "/limelight-front/tx",
+    TV: "/limelight-front/tv",
+    TA: "/limelight-front/ta",
+    HW: "/limelight-front/hw",
+  },
+
+  LIMELIGHT_LIME2PLUS: {
+    HW: "/limelight-lime2plus/hw",
+  },
+
+  MODES: {
+    AIMLOCK_LIME4:  "/Modes/AimLockLime4",
+    AIMLOCK_LIME2:  "/Modes/AimLockLime2",
+    ALIGN_LIME2:    "/Modes/AlignLime2",
+    AIMLOCK_LIME2P: "/Modes/AimLockLime2Plus",
+    SHOOTER_LIME2P: "/Modes/ShooterLime2Plus",
+    ALIGN_PIECE:    "/Modes/AlignPiece",
+  },
+
+  STREAMDECK: {
+    INTAKE_ANGLE_TOGGLE:   "/StreamDeck/IntakeAngle/toggleCount",
+    INTAKE_ANGLE_ZERO:     "/StreamDeck/IntakeAngle/calibrateZero",
+    INTAKE_ANGLE_TARGET:   "/StreamDeck/IntakeAngle/calibrateTarget",
+    INTAKE_ROLLER_ON:      "/StreamDeck/IntakeRoller/intakeToggle",
+    INTAKE_ROLLER_OFF:     "/StreamDeck/IntakeRoller/outtakeToggle",
+  },
+
 };
-
-// ═══════════════════════════════════════
-// DOM
-// ═══════════════════════════════════════
-
-const el = {
-
-  batteryVoltage:
-    document.getElementById("battery-voltage"),
-
-  totalCurrent:
-    document.getElementById("total-current"),
-
-  drivetrainCurrent:
-    document.getElementById("drivetrain-current"),
-
-  stressScore:
-    document.getElementById("stress-score"),
-
-  chassisSpeed:
-    document.getElementById("chassis-speed"),
-
-  speedScale:
-    document.getElementById("speed-scale"),
-
-  stressStatus:
-    document.getElementById("stress-status"),
-
-  speedWarning:
-    document.getElementById("speed-warning"),
-};
-
-// ═══════════════════════════════════════
-// TOPIC SUBSCRIPTIONS
-// ═══════════════════════════════════════
-
-subscribe(
-
-  TOPICS.STRESS_BATTERY_VOLTAGE,
-
-  value => {
-
-    stress.batteryVoltage =
-      Number(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_TOTAL_CURRENT,
-
-  value => {
-
-    stress.totalCurrent =
-      Number(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_DRIVETRAIN_CURRENT,
-
-  value => {
-
-    stress.drivetrainCurrent =
-      Number(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_SCORE,
-
-  value => {
-
-    stress.stressScore =
-      Number(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_LEVEL,
-
-  value => {
-
-    stress.stressLevel =
-      String(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_SPEED_SCALE,
-
-  value => {
-
-    stress.speedScale =
-      Number(value);
-
-    render();
-  }
-);
-
-subscribe(
-
-  TOPICS.STRESS_CHASSIS_SPEED,
-
-  value => {
-
-    stress.chassisSpeed =
-      Number(value);
-
-    render();
-  }
-);
-
-// ═══════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════
-
-function render() {
-
-  requestAnimationFrame(() => {
-
-    renderNumbers();
-
-    renderStressStatus();
-
-    renderWarnings();
-  });
-}
-
-// ═══════════════════════════════════════
-// NUMBERS
-// ═══════════════════════════════════════
-
-function renderNumbers() {
-
-  setText(
-    el.batteryVoltage,
-    stress.batteryVoltage,
-    " V",
-    2
-  );
-
-  setText(
-    el.totalCurrent,
-    stress.totalCurrent,
-    " A",
-    1
-  );
-
-  setText(
-    el.drivetrainCurrent,
-    stress.drivetrainCurrent,
-    " A",
-    1
-  );
-
-  setText(
-    el.stressScore,
-    stress.stressScore,
-    "",
-    0
-  );
-
-  setText(
-    el.chassisSpeed,
-    stress.chassisSpeed,
-    " m/s",
-    2
-  );
-
-  if (el.speedScale) {
-
-    el.speedScale.innerText =
-      Math.round(
-        stress.speedScale * 100
-      ) + "%";
-  }
-}
-
-// ═══════════════════════════════════════
-// STATUS
-// ═══════════════════════════════════════
-
-function renderStressStatus() {
-
-  if (!el.stressStatus) {
-    return;
-  }
-
-  el.stressStatus.textContent =
-    stress.stressLevel;
-
-  el.stressStatus.className = "";
-
-  switch (stress.stressLevel) {
-
-    case "LOW":
-
-      el.stressStatus.classList.add(
-        "status-ok"
-      );
-
-      break;
-
-    case "MEDIUM":
-
-      el.stressStatus.classList.add(
-        "status-medium"
-      );
-
-      break;
-
-    case "HIGH":
-
-      el.stressStatus.classList.add(
-        "status-high"
-      );
-
-      break;
-
-    case "CRITICAL":
-
-      el.stressStatus.classList.add(
-        "status-critical"
-      );
-
-      break;
-  }
-}
-
-// ═══════════════════════════════════════
-// WARNINGS
-// ═══════════════════════════════════════
-
-function renderWarnings() {
-
-  if (!el.speedWarning) {
-    return;
-  }
-
-  const lowVoltage =
-    stress.batteryVoltage < 11.0;
-
-  const speedLimited =
-    stress.speedScale < 1.0;
-
-  el.speedWarning.classList.toggle(
-    "hidden",
-    !(lowVoltage && speedLimited)
-  );
-}
-
-// ═══════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════
-
-function setText(
-  elem,
-  value,
-  suffix = "",
-  decimals = 0
-) {
-
-  if (!elem) {
-    return;
-  }
-
-  if (
-    typeof value !== "number" ||
-    !isFinite(value)
-  ) {
-
-    return;
-  }
-
-  elem.innerText =
-    value.toFixed(decimals) + suffix;
-}
-
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
-
-render();
