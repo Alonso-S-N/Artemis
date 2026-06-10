@@ -1,34 +1,47 @@
 "use strict";
 
 // ═══════════════════════════════════════
-// WS.JS — WebSocket único compartilhado
 // HYDRA #9163
 // ═══════════════════════════════════════
 
-const WS_URL = "ws://127.0.0.1:5901/nt/dashboard";
+const WS_URL = "ws://127.0.0.1:5901";
 
-const _handlers    = [];
+const _handlers = [];
 const _connHandlers = [];
-const _subscribers = {};  // topic → [fn, fn, ...]
+const _subscribers = {};
 
 let _ws = null;
 
-// ─── API pública ────────────────────────────────────────
+// ──────────────────────────────────────
+// API pública
+// ──────────────────────────────────────
 
-// Recebe TODOS os tópicos (uso interno dos módulos antigos)
 export function onNTMessage(fn) {
   _handlers.push(fn);
 }
 
-// Assina um tópico específico — uso recomendado
 export function subscribe(topic, fn) {
-  if (!_subscribers[topic]) _subscribers[topic] = [];
+  if (!_subscribers[topic]) {
+    _subscribers[topic] = [];
+  }
+
   _subscribers[topic].push(fn);
+
+  console.log(
+    "[SUBSCRIBE]",
+    topic,
+    "total:",
+    _subscribers[topic].length
+  );
 }
 
 export function ntSend(payload) {
-  if (_ws && _ws.readyState === WebSocket.OPEN) {
+  if (!_ws) return;
+
+  if (_ws.readyState === WebSocket.OPEN) {
     _ws.send(JSON.stringify(payload));
+  } else {
+    console.warn("WS fechado, mensagem ignorada:", payload);
   }
 }
 
@@ -36,9 +49,13 @@ export function onConnectionChange(fn) {
   _connHandlers.push(fn);
 }
 
-// ─── WebSocket ──────────────────────────────────────────
+// ──────────────────────────────────────
+// WebSocket
+// ──────────────────────────────────────
 
 function connect() {
+  console.log("Conectando em:", WS_URL);
+
   _ws = new WebSocket(WS_URL);
 
   _ws.onopen = () => {
@@ -48,27 +65,77 @@ function connect() {
 
   _ws.onmessage = (ev) => {
     let msg;
-    try { msg = JSON.parse(ev.data); } catch { return; }
-    if (!msg || msg.topic === undefined || msg.value === undefined) return;
 
-    console.log("RAW:", ev.data);
-    console.log("PARSED:", msg);
+    try {
+      msg = JSON.parse(ev.data);
+    } catch (e) {
+      console.error("JSON inválido:", ev.data);
+      return;
+    }
 
-    // despacha para handlers genéricos
-    _handlers.forEach(fn => fn(msg.topic, msg.value));
+    if (!msg) return;
 
-    // despacha para subscribers específicos
-    const subs = _subscribers[msg.topic];
-    if (subs) subs.forEach(fn => fn(msg.value));
+    const topic = msg.topic;
+    const value = msg.value;
+
+    console.log(
+      "[RX]",
+      topic,
+      value
+    );
+
+    // handlers genéricos
+    for (const fn of _handlers) {
+      try {
+        fn(topic, value);
+      } catch (e) {
+        console.error("Erro handler:", e);
+      }
+    }
+
+    // subscribers específicos
+    const subs = _subscribers[topic];
+
+    if (!subs || subs.length === 0) {
+      console.warn(
+        "[SEM SUBSCRIBER]",
+        topic
+      );
+      return;
+    }
+
+    for (const fn of subs) {
+      try {
+        fn(value);
+      } catch (e) {
+        console.error(
+          "Erro subscriber",
+          topic,
+          e
+        );
+      }
+    }
   };
 
-  _ws.onclose = () => {
-    console.log("WS desconectado — reconectando...");
+  _ws.onclose = (ev) => {
+    console.warn(
+      "WS desconectado",
+      ev.code,
+      ev.reason
+    );
+
     _connHandlers.forEach(fn => fn(false));
+
     setTimeout(connect, 1200);
   };
 
-  _ws.onerror = () => { try { _ws.close(); } catch {} };
+  _ws.onerror = (err) => {
+    console.error("WS erro:", err);
+
+    try {
+      _ws.close();
+    } catch {}
+  };
 }
 
 connect();

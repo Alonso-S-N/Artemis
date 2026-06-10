@@ -11,9 +11,17 @@ def connect():
         print(f"NT3 → {ROBOT_IP} (já conectado)")
         return
     NetworkTables.initialize(server=ROBOT_IP)
-    print(f"NT3 → {ROBOT_IP} (aguardando {NT_TIMEOUT}s...)")
-    time.sleep(NT_TIMEOUT)
-    print("NT conectado:", NetworkTables.isConnected())
+    print(f"NT3 → {ROBOT_IP} (aguardando conexão, timeout={NT_TIMEOUT}s...)")
+    waited = 0.0
+    interval = 0.1
+    while not NetworkTables.isConnected() and waited < NT_TIMEOUT:
+        time.sleep(interval)
+        waited += interval
+
+    if NetworkTables.isConnected():
+        print("NT conectado ✅")
+    else:
+        print("⚠️ NT não conectado após timeout — continuará tentando em background")
 
 
 def get_table(name: str):

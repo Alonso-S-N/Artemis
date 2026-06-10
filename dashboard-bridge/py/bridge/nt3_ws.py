@@ -97,11 +97,15 @@ TABLES_AND_KEYS = {
 
 def init_nt(server_ip: str):
     if NetworkTables.isConnected():
-        print(f"🔗 NT3 -> {server_ip} (ja conectado, reaproveitando)")
+        print(f" NT3 -> {server_ip} (ja conectado, reaproveitando)")
         return
 
     NetworkTables.initialize(server=server_ip)
-    print(f"🔗 NT3 -> {server_ip} (aguardando...)")
+    while not NetworkTables.isConnected():
+        print("Aguardando NT...")
+        await asyncio.sleep(1)
+
+        print("NT conectado!")
 
 def get_table(name):
     return NetworkTables.getTable(name)
@@ -144,11 +148,11 @@ async def pulse_button(table, key):
     table.putBoolean(key, False)
 
 async def nt_monitor():
-    print("📡 Monitor NT3 iniciado")
+    print("Monitor NT3 iniciado")
 
     while True:
         if not NetworkTables.isConnected():
-            print("⚠️ NT desconectado — aguardando reconexão")
+            print("NT desconectado — aguardando reconexão")
             await asyncio.sleep(2)
             continue
 
@@ -170,7 +174,7 @@ async def nt_monitor():
                         try:
                             await ws.send(message)
                         except Exception as e:
-                            print(f"⚠️ Erro ao enviar para cliente: {type(e).__name__}: {e}")
+                            print(f"Erro ao enviar para cliente: {type(e).__name__}: {e}")
                             dead.append(ws)
 
                     for ws in dead:
@@ -180,7 +184,7 @@ async def nt_monitor():
 
 async def handle_ws(ws, path=None):
     clients.add(ws)
-    print(f"✅ WS conectado ({len(clients)})")
+    print(f" WS conectado ({len(clients)})")
 
     try:
         async for message in ws:
@@ -200,10 +204,10 @@ async def handle_ws(ws, path=None):
                 write_value(table, key, value)
 
     except Exception as e:
-        print(f"⚠️ WS handler erro: {type(e).__name__}: {e}")
+        print(f" WS handler erro: {type(e).__name__}: {e}")
     finally:
         clients.discard(ws)
-        print(f"❌ WS desconectado ({len(clients)})")
+        print(f" WS desconectado ({len(clients)})")
 
 
 # =========================
@@ -223,5 +227,5 @@ async def main_async(server_ip: str, port: int):
         ping_interval=20,
         ping_timeout=30,
     ):
-        print(f"🚀 WebSocket em ws://0.0.0.0:{port}")
+        print(f" WebSocket em ws://0.0.0.0:{port}")
         await asyncio.Future()

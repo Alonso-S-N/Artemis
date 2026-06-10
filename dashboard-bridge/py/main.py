@@ -22,7 +22,6 @@ def start_http_server():
 
 
 async def main():
-    # servidor HTTP em thread separada (não bloqueia o asyncio)
     thread = threading.Thread(target=start_http_server, daemon=True)
     thread.start()
 

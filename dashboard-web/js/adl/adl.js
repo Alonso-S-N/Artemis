@@ -80,12 +80,12 @@ onNTMessage((topic, value) => {
       setPill(el.ctxPiece, Boolean(value));
       break;
 
-    case TOPICS.MECHANISMS.SHOOTER_RPM_CURRENT:
+    case TOPICS.SHOOTER_RPM_CURRENT:
       rpmCurrent = Number(value);
       updateRpm();
       break;
 
-    case TOPICS.MECHANISMS.SHOOTER_RPM_TARGET:
+    case TOPICS.SHOOTER_RPM_TARGET:
       rpmTarget = Number(value);
       updateRpm();
       break;
