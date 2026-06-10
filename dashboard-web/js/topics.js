@@ -1,7 +1,7 @@
 "use strict";
 
 import { subscribe } from "./ws.js";
-import { TOPICS } from "./stress/stress.js";
+import { TOPICS } from "./config.js"; // ou ajuste o caminho se seu config estiver em outro lugar
 
 
 const stress = {

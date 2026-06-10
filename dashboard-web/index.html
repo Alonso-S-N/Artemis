@@ -151,9 +151,14 @@
     </div>
   </div>
 
- <script type="module" src="js/ws.js"></script>
-<script type="module" src="js/stress/stress.js"></script>
-<script type="module" src="js/adl/adl.js"></script>
+  <!-- carregar config e ws primeiro -->
+  <script type="module" src="js/config.js"></script>
+  <script type="module" src="js/ws.js"></script>
+
+  <!-- depois carregar os módulos que fazem subscribe -->
+  <script type="module" src="js/topics.js"></script>
+  <script type="module" src="js/stress/stress.js"></script>
+  <script type="module" src="js/adl/adl.js"></script>
 
 </body>
 </html>

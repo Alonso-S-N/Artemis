@@ -1,3 +1,24 @@
+import json
+import os
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+FRONTEND_CONFIG = os.path.join(ROOT, "..", "dashboard-web", "config.json")
+
+_data = {}
+try:
+    with open(FRONTEND_CONFIG, "r", encoding="utf-8") as f:
+        _data = json.load(f)
+except Exception:
+    _data = {}
+
+ROBOT_IP = _data.get("ROBOT_IP", "10.91.63.2")
+WS_PORT = _data.get("WS_PORT", 5901)
+NT_TIMEOUT = _data.get("NT_TIMEOUT", 2)
+POLL_INTERVAL = _data.get("POLL_INTERVAL", 0.1)
+PULSE_TIME = _data.get("PULSE_TIME", 0.2)
+TABLES = _data.get("TABLES", {})
+DEFAULT_VALUES = _data.get("DEFAULT_VALUES", {})
+
 ROBOT_IP  = "10.91.63.2"
 WS_PORT   = 5901
 NT_TIMEOUT = 2          

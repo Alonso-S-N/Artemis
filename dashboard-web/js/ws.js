@@ -1,15 +1,16 @@
 "use strict";
 
+import { CONFIG, TOPICS } from "./config.js"; // novo import
+
 // ═══════════════════════════════════════
 // HYDRA #9163
 // ═══════════════════════════════════════
 
-const WS_URL = "ws://127.0.0.1:5901";
+const WS_URL = CONFIG.WS_URL ?? "ws://127.0.0.1:5901";
 
 const _handlers = [];
 const _connHandlers = [];
 const _subscribers = {};
-
 let _ws = null;
 
 // ──────────────────────────────────────
@@ -55,87 +56,37 @@ export function onConnectionChange(fn) {
 
 function connect() {
   console.log("Conectando em:", WS_URL);
-
   _ws = new WebSocket(WS_URL);
 
   _ws.onopen = () => {
-    console.log("WS conectado");
+    console.log("[WS] aberto");
     _connHandlers.forEach(fn => fn(true));
   };
 
   _ws.onmessage = (ev) => {
-    let msg;
-
     try {
-      msg = JSON.parse(ev.data);
+      const msg = JSON.parse(ev.data);
+      console.log("[RX]", msg.topic, msg.value);
+      const subs = _subscribers[msg.topic];
+      if (!subs || subs.length === 0) {
+        console.warn("[SEM SUBSCRIBER]", msg.topic);
+      } else {
+        subs.forEach(fn => fn(msg.value));
+      }
+      _handlers.forEach(h => h(msg));
     } catch (e) {
-      console.error("JSON inválido:", ev.data);
-      return;
-    }
-
-    if (!msg) return;
-
-    const topic = msg.topic;
-    const value = msg.value;
-
-    console.log(
-      "[RX]",
-      topic,
-      value
-    );
-
-    // handlers genéricos
-    for (const fn of _handlers) {
-      try {
-        fn(topic, value);
-      } catch (e) {
-        console.error("Erro handler:", e);
-      }
-    }
-
-    // subscribers específicos
-    const subs = _subscribers[topic];
-
-    if (!subs || subs.length === 0) {
-      console.warn(
-        "[SEM SUBSCRIBER]",
-        topic
-      );
-      return;
-    }
-
-    for (const fn of subs) {
-      try {
-        fn(value);
-      } catch (e) {
-        console.error(
-          "Erro subscriber",
-          topic,
-          e
-        );
-      }
+      console.error("Mensagem WS inválida:", e);
     }
   };
 
-  _ws.onclose = (ev) => {
-    console.warn(
-      "WS desconectado",
-      ev.code,
-      ev.reason
-    );
-
+  _ws.onclose = () => {
+    console.log("[WS] fechado");
     _connHandlers.forEach(fn => fn(false));
-
-    setTimeout(connect, 1200);
+    // reconectar after short delay
+    setTimeout(connect, 1000);
   };
 
-  _ws.onerror = (err) => {
-    console.error("WS erro:", err);
-
-    try {
-      _ws.close();
-    } catch {}
-  };
+  _ws.onerror = (err) => { console.error("WS error", err); };
 }
 
 connect();

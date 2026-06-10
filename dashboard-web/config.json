@@ -1,0 +1,25 @@
+{
+  "WS_URL": "ws://127.0.0.1:5901",
+  "ROBOT_IP": "10.91.63.2",
+  "WS_PORT": 5901,
+  "NT_TIMEOUT": 2,
+  "POLL_INTERVAL": 0.1,
+  "PULSE_TIME": 0.2,
+  "TOPICS": {
+    "STRESS": {
+      "BATTERY_VOLTAGE": "/RobotStress/batteryVoltage",
+      "TOTAL_CURRENT": "/RobotStress/totalCurrent",
+      "DRIVETRAIN_CURRENT": "/RobotStress/drivetrainCurrent",
+      "SCORE": "/RobotStress/stressScore",
+      "LEVEL": "/RobotStress/stressLevel",
+      "SPEED_SCALE": "/RobotStress/speedScale",
+      "CHASSIS_SPEED": "/RobotStress/chassisSpeed"
+    },
+    "ADL": {
+      "STATE": "/ADL/state",
+      "DECISION": "/ADL/decision",
+      "INTENT": "/ADL/intent"
+    }
+    
+  }
+}

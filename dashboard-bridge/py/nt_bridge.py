@@ -19,7 +19,7 @@ def connect():
         waited += interval
 
     if NetworkTables.isConnected():
-        print("NT conectado ✅")
+        print("NT conectado ")
     else:
         print("⚠️ NT não conectado após timeout — continuará tentando em background")
 
