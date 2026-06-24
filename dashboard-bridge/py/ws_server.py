@@ -1,6 +1,3 @@
-# ws_server.py — servidor WebSocket e loop de broadcast
-# Não edite este arquivo. Configure em config.py.
-
 import asyncio
 import json
 import websockets
@@ -8,9 +5,7 @@ import websockets
 import nt_bridge
 from config import TABLES, WS_PORT, POLL_INTERVAL, PULSE_TIME
 
-# conjunto de clientes WS ativos
 clients: set = set()
-
 
 # ─── Broadcast ──────────────────────────────────────────
 

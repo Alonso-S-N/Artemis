@@ -22,18 +22,16 @@ export function onNTMessage(fn) {
 }
 
 export function subscribe(topic, fn) {
-  if (!_subscribers[topic]) {
-    _subscribers[topic] = [];
-  }
-
+  // garante array e regista handler
+  if (!_subscribers[topic]) _subscribers[topic] = [];
   _subscribers[topic].push(fn);
-
-  console.log(
-    "[SUBSCRIBE]",
-    topic,
-    "total:",
-    _subscribers[topic].length
-  );
+  // log para debug
+  console.log("[SUBSCRIBE]", topic, "handlers:", _subscribers[topic].length);
+  // retorna unsubscribe
+  return () => {
+    _subscribers[topic] = (_subscribers[topic] || []).filter(h => h !== fn);
+    console.log("[UNSUBSCRIBE]", topic, "handlers:", _subscribers[topic].length);
+  };
 }
 
 export function ntSend(payload) {
@@ -66,10 +64,10 @@ function connect() {
   _ws.onmessage = (ev) => {
     try {
       const msg = JSON.parse(ev.data);
-      console.log("[RX]", msg.topic, msg.value);
       const subs = _subscribers[msg.topic];
+      console.log("[RX]", msg.topic, msg.value, "subscribers:", subs ? subs.length : 0);
       if (!subs || subs.length === 0) {
-        console.warn("[SEM SUBSCRIBER]", msg.topic);
+        console.warn("[SEM SUBSCRIBER]", msg.topic, "known topics:", Object.keys(_subscribers));
       } else {
         subs.forEach(fn => fn(msg.value));
       }

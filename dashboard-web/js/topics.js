@@ -61,6 +61,52 @@ subscribe(TOPICS.STRESS.CHASSIS_SPEED, v => {
   stress.chassisSpeed = Number(v); render();
 });
 
+// Vision
+subscribe(TOPICS.VISION.HASTARGET, v => {
+  console.log("Vision.HasTarget", v);
+  // atualizar DOM específico, ex: el.hasTarget?.classList.toggle("active", Boolean(v));
+});
+subscribe(TOPICS.VISION.ALIGNED, v => {
+  console.log("Vision.Aligned", v);
+});
+subscribe(TOPICS.VISION.CONFIDENCE, v => {
+  console.log("Vision.Confidence", v);
+});
+
+// Mechanisms
+subscribe(TOPICS.MECHANISMS.SHOOTER_READY, v => {
+  console.log("Mechanisms.ShooterReady", v);
+});
+subscribe(TOPICS.MECHANISMS.HAS_GAME_PIECE, v => {
+  console.log("Mechanisms.HasGamePiece", v);
+});
+subscribe(TOPICS.MECHANISMS.INTAKE_ACTIVE, v => {
+  console.log("Mechanisms.IntakeActive", v);
+});
+subscribe(TOPICS.MECHANISMS.CLIMB_AVAILABLE, v => {
+  console.log("Mechanisms.ClimbAvailable", v);
+});
+
+// Shooter
+subscribe(TOPICS.SHOOTER.CURRENT_RPM, v => { console.log("Shooter.CurrentRPM", v); });
+subscribe(TOPICS.SHOOTER.TARGET_RPM, v => { console.log("Shooter.TargetRPM", v); });
+
+// Drive / Robot / Game
+subscribe(TOPICS.DRIVE.MOVING, v => { console.log("Drive.Moving", v); });
+subscribe(TOPICS.ROBOT.BATTERY_VOLTAGE, v => { console.log("Robot.BatteryVoltage", v); });
+subscribe(TOPICS.ROBOT.SPEED_LIMITED, v => { console.log("Robot.SpeedLimited", v); });
+subscribe(TOPICS.GAME.ENDGAME, v => { console.log("Game.Endgame", v); });
+
+// StreamDeck (nested)
+subscribe(TOPICS.STREAMDECK.INTAKE_ANGLE.TOGGLE_COUNT, v => { console.log("SD/IntakeAngle/toggleCount", v); });
+
+// Limelight
+subscribe(TOPICS.LIMELIGHT_BACK.PIECE_TX, v => { console.log("LL-back/piece_tx", v); });
+subscribe(TOPICS.LIMELIGHT_BACK.BBOX, v => { console.log("LL-back/bbox", v); });
+
+// Modes
+subscribe(TOPICS.MODES.ALIGN_PIECE, v => { console.log("Modes.AlignPiece", v); });
+
 // ═══════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════

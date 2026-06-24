@@ -1,10 +1,5 @@
 {
   "WS_URL": "ws://127.0.0.1:5901",
-  "ROBOT_IP": "10.91.63.2",
-  "WS_PORT": 5901,
-  "NT_TIMEOUT": 2,
-  "POLL_INTERVAL": 0.1,
-  "PULSE_TIME": 0.2,
   "TOPICS": {
     "STRESS": {
       "BATTERY_VOLTAGE": "/RobotStress/batteryVoltage",
@@ -19,7 +14,64 @@
       "STATE": "/ADL/state",
       "DECISION": "/ADL/decision",
       "INTENT": "/ADL/intent"
+    },
+    "VISION": {
+      "HASTARGET": "/Vision/HasTarget",
+      "ALIGNED": "/Vision/Aligned",
+      "CONFIDENCE": "/Vision/Confidence"
+    },
+    "MECHANISMS": {
+      "SHOOTER_READY": "/Mechanisms/ShooterReady",
+      "HAS_GAME_PIECE": "/Mechanisms/HasGamePiece",
+      "INTAKE_ACTIVE": "/Mechanisms/IntakeActive",
+      "CLIMB_AVAILABLE": "/Mechanisms/ClimbAvailable"
+    },
+    "SHOOTER": {
+      "CURRENT_RPM": "/Shooter/CurrentRPM",
+      "TARGET_RPM": "/Shooter/TargetRPM"
+    },
+    "DRIVE": {
+      "MOVING": "/Drive/Moving"
+    },
+    "ROBOT": {
+      "BATTERY_VOLTAGE": "/Robot/BatteryVoltage",
+      "SPEED_LIMITED": "/Robot/SpeedLimited"
+    },
+    "GAME": {
+      "ENDGAME": "/Game/Endgame"
+    },
+    "STREAMDECK": {
+      "INTAKE_ANGLE": {
+        "TOGGLE_COUNT": "/StreamDeck/IntakeAngle/toggleCount",
+        "CAL_ZERO": "/StreamDeck/IntakeAngle/calibrateZero",
+        "CAL_TARGET": "/StreamDeck/IntakeAngle/calibrateTarget"
+      },
+      "INTAKE_ROLLER": {
+        "INTAKE_TOGGLE": "/StreamDeck/IntakeRoller/intakeToggle",
+        "OUTTAKE_TOGGLE": "/StreamDeck/IntakeRoller/outtakeToggle"
+      }
+    },
+    "LIMELIGHT_BACK": {
+      "PIECE_TX": "/limelight-back/piece_tx",
+      "TA": "/limelight-back/ta",
+      "PIECE_DISTANCE": "/limelight-back/piece_distance",
+      "HAS_TARGET": "/limelight-back/has_target",
+      "BBOX": "/limelight-back/bbox",
+      "HW": "/limelight-back/hw"
+    },
+    "LIMELIGHT_FRONT": {
+      "TX": "/limelight-front/tx",
+      "TV": "/limelight-front/tv",
+      "TA": "/limelight-front/ta",
+      "HW": "/limelight-front/hw"
+    },
+    "MODES": {
+      "AIMLOCK_LIME4": "/Modes/AimLockLime4",
+      "AIMLOCK_LIME2": "/Modes/AimLockLime2",
+      "ALIGN_LIME2": "/Modes/AlignLime2",
+      "AIMLOCK_LIME2PLUS": "/Modes/AimLockLime2Plus",
+      "SHOOTER_LIME2PLUS": "/Modes/ShooterLime2Plus",
+      "ALIGN_PIECE": "/Modes/AlignPiece"
     }
-    
   }
 }
