@@ -256,9 +256,10 @@ public class RobotContainer {
      m_ledBuffer = new AddressableLEDBuffer(720);
      m_led.setLength(m_ledBuffer.getLength());
 
-     LEDPattern red = LEDPattern.solid(Color.kGreen);
+      LEDPattern gradient = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGreen, Color.kBlack, Color.kGreen);
+    
 
-     red.applyTo(m_ledBuffer);
+     gradient.applyTo(m_ledBuffer);
      m_led.setData(m_ledBuffer);
 
      m_led.setData(m_ledBuffer);
